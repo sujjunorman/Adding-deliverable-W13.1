@@ -1,0 +1,61 @@
+
+
+--indexes being incorporated in a table--
+-- Indexes are used to find values within a specific column more quickly
+-- SQL normally searches sequentially through a column
+-- The longer the column, the more expensive the operation is
+-- UPDATE takes more time, SELECT takes less time
+
+Create table Customers
+(	
+	CustomerID INT NOT NULL,
+	CustomerName char(100) NOT NULL,
+	CustomerAddress char(100) NOT NULL,
+	Comments varchar(200) NOT NULL
+	)
+	GO
+	
+	--Create a unique index on the previous created table---
+	
+	CREATE UNIQUE CLUSTERED INDEX id_Customers ON Customers(CustomerID)
+	GO
+	
+	-- Insert records into the table---
+	DECLARE @i INT =1
+	WHILE (@i <=7000)
+	BEGIN
+		INSERT INTO Customers Values (
+			@i,
+			'CustomerName' + CAST(@i AS CHAR),
+			'CustomerAddress' + CAST(@i AS CHAR),
+			'Comments' + CAST(@i AS CHAR),
+		)
+		
+		SET @i +=1
+	END
+	GO
+	
+---Create a non unique non clustered index on the clustered table--
+
+	CREATE NONCLUSTERED INDEX idx_NonUniqueNCI_CustomerID
+	ON Customers(CustomerName)
+	GO
+	
+--- Retrieve physical information about the unique non clustured index
+	SELECT * FROM sys.dm_db_index_physical_stats(
+	DB_ID('NonClusteredIndexes'),
+	OBJECT_ID('Customers'),
+	2,
+	NULL,
+	'DETAILED'
+	)
+	GO
+	
+--	Execution plan using 
+	
+	use AdventureWorks2019
+	Select firstname, lastname
+	from HumanResources.vEmployee
+	
+	
+	
